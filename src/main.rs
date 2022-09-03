@@ -1,29 +1,44 @@
-use std::cmp::{max, min};
+use std::{
+    cmp::{max, min},
+    fs::File,
+};
 
 use disjoint_sets::UnionFind;
-use image::{imageops::rotate270, ImageBuffer, Rgb};
+use image::codecs::gif::{GifEncoder};
+use image::{Frame,imageops::rotate270, ImageBuffer, Rgba};
 use rand::{self, Rng};
-const WIDTH: usize = 1920;
-const HIGHT: usize = 1200;
+const WIDTH: usize = 1024 * 3;
+const HIGHT: usize = 1024 * 2;
 const FRACT: f64 = 0.5;
 const CHARS: &str = "⋅╶╷┌╴─┐┬╵└│├┘┴┤┼";
 
 fn main() {
     println!("{}", WIDTH * HIGHT);
+    let mut fraction = 1.0;
     let mut grid = Grid::new();
-    grid.init_random();
-    // grid.draw_grid();
-    let field = grid.find_connected_components();
-    let image = ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32,|x,y|{
-        let val= (field[y as usize][x as usize]) %256;
-        Rgb([(13*val) as u8,(17*val) as u8,(15*val) as u8])
-    });
-    //let image: ImageBuffer<Luma<_>, Vec<_>> =
-    //    ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
-    //        Luma::<u16>([field[y as usize][x as usize].try_into().unwrap()])
-    //    });
-    //let image = rotate270(&image);
-    image.save("output.png").unwrap();
+    let mut file_out = File::open("out.gif").unwrap();
+    let mut encoder = GifEncoder::new(file_out);
+    let mut frames = vec![];
+    loop {
+        fraction -= 0.1;
+        if fraction < 0.1 {
+            break;
+        }
+        grid.init_random(fraction);
+        // grid.draw_grid();
+        let field = grid.find_connected_components();
+        frames.push(Frame::new(ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
+            let val = (field[y as usize][x as usize]) % 256;
+            Rgba([(13 * val) as u8, (17 * val) as u8, (15 * val) as u8,255])
+        })));
+        //let image: ImageBuffer<Luma<_>, Vec<_>> =
+        //    ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
+        //        Luma::<u16>([field[y as usize][x as usize].try_into().unwrap()])
+        //    });
+        //let image = rotate270(&image);
+    }
+    
+    encoder.encode_frames(frames).unwrap();
 }
 
 struct Grid {
@@ -103,12 +118,12 @@ impl Grid {
         field
     }
 
-    fn init_random(&mut self) {
+    fn init_random(&mut self, fraction: f64) {
         let mut rng = rand::thread_rng();
         for x in 1..=WIDTH {
             for y in 1..=HIGHT {
-                self.right[y][x] = rng.gen_bool(FRACT);
-                self.down[y][x] = rng.gen_bool(FRACT);
+                self.right[y][x] = rng.gen_bool(fraction);
+                self.down[y][x] = rng.gen_bool(fraction);
             }
         }
         for y in 1..=HIGHT {
