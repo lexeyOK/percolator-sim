@@ -6,5 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+disjoint-sets = "0.4.2"
 image = "0.24.3"
 rand = "0.8.5"
+
+[profile.release]
+debug = true
