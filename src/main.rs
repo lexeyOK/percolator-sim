@@ -13,7 +13,6 @@ fn main() -> ! {
     let mut grid = Grid::new();
     loop {
         grid.init_random();
-        // grid.draw_grid();
         let field = grid.find_connected_components();
         let image = ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
             let val = field[(y as usize) * HIGHT + (x as usize)] % 256;
@@ -56,7 +55,6 @@ impl Grid {
         let mut eq_set: UnionFind<usize> = UnionFind::new(WIDTH * HIGHT);
         for x in 1..=WIDTH {
             for y in 1..=HIGHT {
-                // get neighbours
                 let (nodes, num) = {
                     let mut temp = (0, 0);
                     let mut num = 0;
@@ -88,7 +86,7 @@ impl Grid {
                 }
             }
         }
-        //println!("{:?}", (0..WIDTH*HIGHT).map(|n| eq_set.find(n)).collect::<Vec<_>>());
+
         let mut output_lables = vec![0usize; WIDTH * HIGHT];
         let mut count = 0;
         for x in 0..WIDTH {
