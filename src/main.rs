@@ -1,7 +1,7 @@
 use std::cmp::{max, min};
 
 use disjoint_sets::UnionFind;
-use image::{imageops::rotate270, ImageBuffer, Rgb};
+use image::{ImageBuffer, Rgb};
 use rand::{self, Rng};
 const WIDTH: usize = 1024 * 2;
 const HIGHT: usize = 1024;
@@ -17,12 +17,6 @@ fn main() {
         let val = (field[y as usize][x as usize]) % 256;
         Rgb([(13 * val) as u8, (17 * val) as u8, (15 * val) as u8])
     });
-    //let image: ImageBuffer<Luma<_>, Vec<_>> =
-    //    ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
-    //        Luma::<u16>((field(y as usize)(x as usize).try_into().unwrap()))
-    //        Luma::<u16>([field[y as usize][x as usize].try_into().unwrap()])
-    //    });
-    //let image = image::imageops::rotate270(&image);
     image.save("output.ppm").unwrap();
 }
 
