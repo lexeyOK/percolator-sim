@@ -3,8 +3,8 @@ use std::cmp::{max, min};
 use disjoint_sets::UnionFind;
 use image::{imageops::rotate270, ImageBuffer, Rgb};
 use rand::{self, Rng};
-const WIDTH: usize = 1920;
-const HIGHT: usize = 1200;
+const WIDTH: usize = 1024 * 2;
+const HIGHT: usize = 1024;
 const FRACT: f64 = 0.5;
 const CHARS: &str = "⋅╶╷┌╴─┐┬╵└│├┘┴┤┼";
 
@@ -19,10 +19,11 @@ fn main() {
     });
     //let image: ImageBuffer<Luma<_>, Vec<_>> =
     //    ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
+    //        Luma::<u16>((field(y as usize)(x as usize).try_into().unwrap()))
     //        Luma::<u16>([field[y as usize][x as usize].try_into().unwrap()])
     //    });
-    //let image = rotate270(&image);
-    image.save("output.png").unwrap();
+    //let image = image::imageops::rotate270(&image);
+    image.save("output.ppm").unwrap();
 }
 
 struct Grid {
