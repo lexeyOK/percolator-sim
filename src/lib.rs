@@ -1,38 +1,17 @@
 use disjoint_sets::UnionFind;
 use std::cmp::{max, min};
 
-use image::{ImageBuffer, Rgb};
-use rand::{self, Rng};
-
-const WIDTH: usize = 1024 * 2;
-const HIGHT: usize = 1024;
-const FRACT: f64 = 0.5;
 const CHARS: &str = "⋅╶╷┌╴─┐┬╵└│├┘┴┤┼";
 
-fn main() {
-    println!("{}", WIDTH * HIGHT);
-
-    let mut grid = Grid::new(WIDTH, HIGHT);
-    init_random(&mut grid);
-
-    let field = grid.find_connected_components();
-
-    let image = ImageBuffer::from_fn(WIDTH as u32, HIGHT as u32, |x, y| {
-        let val = (field[y as usize][x as usize]) % 256;
-        Rgb([(13 * val) as u8, (17 * val) as u8, (15 * val) as u8])
-    });
-    image.save("output.png").unwrap();
-}
-
-struct Grid {
+pub struct Grid {
     right: Vec<Vec<bool>>,
     down: Vec<Vec<bool>>,
-    width: usize,
-    hight: usize,
+    pub width: usize,
+    pub hight: usize,
 }
 
 impl Grid {
-    fn new(width: usize, hight: usize) -> Grid {
+    pub fn new(width: usize, hight: usize) -> Grid {
         Grid {
             right: vec![vec![false; width + 1]; hight + 1],
             down: vec![vec![false; width + 1]; hight + 1],
@@ -41,20 +20,16 @@ impl Grid {
         }
     }
 
-    fn draw_grid(&self) {
-        for y in 1..=self.hight {
-            for x in 1..=self.width {
-                let mask = 8 * self.down[y - 1][x] as usize
-                    + 4 * self.right[y][x - 1] as usize
-                    + 2 * self.down[y][x] as usize
-                    + self.right[y][x] as usize;
-                print!("{}", CHARS.chars().nth(mask).unwrap_or('E'))
-            }
-            println!();
+    pub fn from_bools(right: Vec<Vec<bool>>,down: Vec<Vec<bool>>, width: usize, hight: usize) -> Grid{
+        Grid {
+            right,
+            down,
+            width,
+            hight,
         }
     }
 
-    fn find_connected_components(&self) -> Vec<Vec<usize>> {
+    pub fn find_connected_components(&self) -> Vec<Vec<usize>> {
         let mut field = vec![vec![0; self.width]; self.hight];
         if self.width == 0 || self.hight == 0 {
             return field;
@@ -110,20 +85,18 @@ impl Grid {
         }
         field
     }
+
+    fn draw_grid(&self) {
+        for y in 1..=self.hight {
+            for x in 1..=self.width {
+                let mask = 8 * self.down[y - 1][x] as usize
+                    + 4 * self.right[y][x - 1] as usize
+                    + 2 * self.down[y][x] as usize
+                    + self.right[y][x] as usize;
+                print!("{}", CHARS.chars().nth(mask).unwrap_or('E'))
+            }
+            println!();
+        }
+      }
 }
 
-fn init_random(grid: &mut Grid) {
-    let mut rng = rand::thread_rng();
-    for x in 1..grid.width {
-        for y in 1..grid.hight {
-            grid.right[y][x] = rng.gen_bool(FRACT);
-            grid.down[y][x] = rng.gen_bool(FRACT);
-        }
-    }
-    for y in 1..=HIGHT {
-        grid.right[y][WIDTH] = false;
-    }
-    for x in 1..=WIDTH {
-        grid.down[HIGHT][x] = false;
-    }
-}
